@@ -28,10 +28,13 @@ with st.form(key='my_form'):
     internal = st.radio('Is it internal ?', ('Yes','No'), index=0)
     multipurpose = st.radio('Is it a multi purpose product ?', ('Yes','No'), index=0)
     sl_form = st.selectbox('Is it Solid/Liquid ?', ('Solid','Liquid'), index=0)
-    co_ord = st.radio('Co-ord/ Congruent PO4', ('Yes','No'), index=1)
+    # co_ord = st.radio('Co-ord/ Congruent PO4', ('Yes','No'), index=1)
+    co_ord = 'No'
     po4 = st.selectbox('PO4', ('Yes','No'), index=0)
-    cpo4 = st.radio('Chelant PO4', ('Yes','No'), index=1)
-    all_poly = st.radio('All Poly', ('Yes','No'), index=1)
+    # cpo4 = st.radio('Chelant PO4', ('Yes','No'), index=1)
+    cpo4 = 'No'
+    # all_poly = st.radio('All Poly', ('Yes','No'), index=1)
+    all_poly = 'No'
     na_po4 = st.selectbox('Does it have Na:PO4', ['Not applicable','Not recommended'], index=0)
     dairy = st.radio('Is it for dairy application ?', ('Yes','No'), index=1)
     food = st.radio('Is it for direct food application ?', ('Yes','No'), index=0)
@@ -46,7 +49,8 @@ with st.form(key='my_form'):
     turbine = st.selectbox('Turbine used in Plant ?', ['Compatible, not beneficial, true but would never be used in a plant with a turbine', 'Yes', 'Compatible, not beneficial'], index=0)
     yellow = st.selectbox('Compatibility with Yellow metals', ['Yes', 'Compatible, not beneficial', 'No'], index=0)
     dr = st.selectbox('DR',["Not applicable", "Not recommended", '1.7', '1.84', '2.88', '1.3', '4.2'], index=0)
-    f_amine = st.radio('Filming Amine', ('Yes','No'), index=1)
+    # f_amine = st.radio('Filming Amine', ('Yes','No'), index=1)
+    f_amine = 'No'
     tot_amine = st.selectbox('Total % Amine',['4.8', '0.0', '45.0', '42.0', '0.9', '35.0', '40.0', '30.0'], index=0)
     ox_scav = st.radio('Are there Ox scavengers ?', ('Yes','No'), index=0)
     contains_cat = st.radio('Is there catalyst ?', ('Yes','No'), index=1)
