@@ -23,38 +23,53 @@ with st.form(key='my_form'):
     psig2 = st.radio('Is pressure less than 60 bar ?', ('Yes','No'), index=0)
     # psig3 = st.radio('>870 PSIG (>60 BAR)', ('Yes','No'), index=0)
 
-    sa = st.radio('Is it Single Active', ('Yes','No'), index=1)
-    fw = st.selectbox('Feed water quality', ('Demineralized','RO'), index=1)
-    internal = st.radio('Is it internal ?', ('Yes','No'), index=0)
-    multipurpose = st.radio('Is it a multi purpose product ?', ('Yes','No'), index=0)
-    sl_form = st.selectbox('Is it Solid/Liquid ?', ('Solid','Liquid'), index=0)
+    sa = st.radio('Is it Single Active ?', ('Yes','No'), index=1)
+    fw = st.selectbox('Feed water quality (RO / Demineralized)', ('Demineralized','RO'), index=1)
+    internal = st.radio('Is an Internal Treatment product only required ?', ('Yes','No'), index=0)
+    multipurpose = st.radio('Is a Multipurpose product (Int + S&C) required ?', ('Yes','No'), index=0)
+    sl_form = st.selectbox('Is it Solid/Liquid product ?', ('Solid','Liquid'), index=0)
     # co_ord = st.radio('Co-ord/ Congruent PO4', ('Yes','No'), index=1)
     co_ord = 'No'
-    po4 = st.selectbox('PO4', ('Yes','No'), index=0)
+
+
+    st.markdown("## Internal Treatment")
+    po4 = st.selectbox('Is Phosphate (PO4) allowed in the product ?', ('Yes','No'), index=0)
     # cpo4 = st.radio('Chelant PO4', ('Yes','No'), index=1)
     cpo4 = 'No'
     # all_poly = st.radio('All Poly', ('Yes','No'), index=1)
     all_poly = 'No'
+
+    # should be removed in future 
     na_po4 = st.selectbox('Does it have Na:PO4', ['Not applicable','Not recommended'], index=0)
-    dairy = st.radio('Is it for dairy application ?', ('Yes','No'), index=1)
+
+    dairy = st.radio('Is it for Dairy application ?', ('Yes','No'), index=1)
     food = st.radio('Is it for direct food application ?', ('Yes','No'), index=0)
-    fda = st.selectbox('Select ffrom the list of FDA Approved direct contact limit',
+    fda = st.selectbox('Is it FDA approved for direct contact ? [Yes(Refer to US FDA for details or contact SME)/No]' ,
                         ["Partially volatile", "Not Volatile", "No limit + Not Volatile", "< 33 ppm in steam, in NA it is 15 ppm", "NOT ALLOWED, in NA it is a limit of 10 ppm (total amine)", "<500 ppm in steam", "<70 ppm in steam", "<62 ppm in steam", "NOT ALLOWED", "No limit"],
                         index=0)
-    defoamer = st.radio('Is it defoamer application ?', ('Yes','No'), index=1)
-    avt = st.radio('Is there AVT ?', ('Yes','No'), index=1)
-    n_amine = st.radio('Is there N Amine ?', ('Yes','No'), index=0)
-    v_n_amine = st.radio('Is there volatile Ox scav & N amine ?', ('Yes','No'), index=1)
-    steam = st.radio('Is there Steam & Condensate ?', ('Yes','No'), index=0)
-    turbine = st.selectbox('Turbine used in Plant ?', ['Compatible, not beneficial, true but would never be used in a plant with a turbine', 'Yes', 'Compatible, not beneficial'], index=0)
-    yellow = st.selectbox('Compatibility with Yellow metals', ['Yes', 'Compatible, not beneficial', 'No'], index=0)
-    dr = st.selectbox('DR',["Not applicable", "Not recommended", '1.7', '1.84', '2.88', '1.3', '4.2'], index=0)
+    defoamer = st.radio('Is a Defoamer required ?', ('Yes','No'), index=1)
+
+    st.markdown("## Condensate Treatment (Neutralizing Amine) ")
+
+    avt = st.radio('Is All Volatile Treatment (AVT) required ?', ('Yes','No'), index=1)
+    n_amine = st.radio('Is Neutralizing Amine treatment required ?', ('Yes','No'), index=0)
+    v_n_amine = st.radio('Is a volatile Oxygen Scavenger and Neutralizing Amine Product required ?', ('Yes','No'), index=1)
+    steam = st.radio('Is treatment of Steam & Condensate required?', ('Yes','No'), index=0)
+
+    # Turbine to be removed
+    turbine = st.selectbox('Turbine used in Plant ? (to be removed)', ['Compatible, not beneficial, true but would never be used in a plant with a turbine', 'Yes', 'Compatible, not beneficial'], index=0)
+    yellow = st.selectbox('Is it compatible with Yellow metals ? (to be changed to Yes/No only)', ['Yes', 'Compatible, not beneficial', 'No'], index=0)
+
+    # Options to be changed
+    dr = st.selectbox('Distribution Ratio of Amines (<2.4 / >2.4)',["Not applicable", "Not recommended", '1.7', '1.84', '2.88', '1.3', '4.2'], index=0)
     # f_amine = st.radio('Filming Amine', ('Yes','No'), index=1)
     f_amine = 'No'
-    tot_amine = st.selectbox('Total % Amine',['4.8', '0.0', '45.0', '42.0', '0.9', '35.0', '40.0', '30.0'], index=0)
+    tot_amine = st.selectbox('Total % Amine (to be removed)',['4.8', '0.0', '45.0', '42.0', '0.9', '35.0', '40.0', '30.0'], index=0)
+    
+    st.markdown("## Oxygen Scavenger Treatment")
     ox_scav = st.radio('Are there Ox scavengers ?', ('Yes','No'), index=0)
-    contains_cat = st.radio('Is there catalyst ?', ('Yes','No'), index=1)
-    passivation = st.radio('Is there Passivation ?', ('Yes','No'), index=1)
+    contains_cat = st.radio('Is there catalyst in the product ?', ('Yes','No'), index=1)
+    passivation = st.radio('Is there Passivation (Jothi to get back) ?', ('Yes','No'), index=1)
     submit_button = st.form_submit_button(label='Submit')
 if submit_button:
     dset = pd.read_csv('all_data_encoded.csv')
@@ -117,8 +132,3 @@ if submit_button:
         We could not find a product for such an input combination :( 
         Please re-check the i/p condition or parameters!
         ''')
-    
- 
-
-
-
