@@ -24,7 +24,8 @@ sa_dict = {
 }
 
 fw_dict = {
-    'Demineralized':1,
+    'Raw water':1,
+    'Demineralized':3,
     'RO':2
 }
 
@@ -79,16 +80,8 @@ food_dict = {
 }
 
 fda_dict ={
-    '<500 ppm in steam':1,
-    '<62 ppm in steam':2,
-    '<70 ppm in steam':3,
-    'No limit':4,
-    'NOT ALLOWED':5,
-    'Not Volatile':6,
-    '< 33 ppm in steam, in NA it is 15 ppm':7,
-    'No limit + Not Volatile':8,
-    'NOT ALLOWED, in NA it is a limit of 10 ppm (total amine)':9,
-    'Partially volatile':10
+    'Yes (refer to US FDA for details or contact SME)':1,
+    'No':0
 }
 
 defoamer_dict = {
@@ -121,19 +114,14 @@ turbine_dict = {
 }
 
 yellow_dict = {
-    'Compatible, not beneficial':1,
-    'No':2,
-    'Yes':3
+    'No':0,
+    'Yes':1
 }
 
 dr_dict = {
-    '1.3':1,
-    '1.7':2,
-    '1.84':3,
-    '2.88':4,
-    '4.2':5,
-    'Not applicable':6,
-    'Not recommended':7
+    'Not applicable': 3,
+    '< 2.4': 1,
+    '> 2.4':2
 }
 
 f_amine_dict = {
