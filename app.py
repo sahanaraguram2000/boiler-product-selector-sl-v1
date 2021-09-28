@@ -5,113 +5,328 @@ from constants import *
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import tree
 from sklearn import metrics
-# Todo
-# 1. Y/N
-# 2. L/S
-# 3. Populate default value as 1st entry
+submit_button=None
 
-# fw -> feed water
-# ro -> RO water
-# Dmin - >Dmineralized water
-# Soft -> Soft water
-# L S -> liquid / solid
-
-st.title('Boiler Product Selector')
-with st.form(key='my_form'):
-    opco = st.selectbox('Operating Country (OPCO)', ['USA','China','RSA','LATAM','Canada','EMEA'], index=0)
-    psig1 = st.radio('Is pressure less than 10 bar ?', ('Yes','No'), index=0)
-    psig2 = st.radio('Is pressure less than 60 bar ?', ('Yes','No'), index=0)
-    sa = st.radio('Is it Single Active ?', ('Yes','No'), index=1)
-    fw = st.selectbox('Feed water quality (RO / Demineralized)', ('Demineralized','RO'), index=0)
-    sl_form = st.selectbox('Is it Solid/Liquid product ?', ('Solid','Liquid'), index=0)
-    dairy = st.radio('Is it for Dairy application ?', ('Yes','No'), index=1)
-    food = st.radio('Is it for direct food application ?', ('Yes','No'), index=0)
-    fda = st.selectbox('Is it FDA approved for direct contact ? [Yes(Refer to US FDA for details or contact SME)/No]' ,
-                    ["Yes (refer to US FDA for details or contact SME)", "No"],
-                    index=0)
-    avt = st.radio('Is All Volatile Treatment (AVT) required ? (Only for Neutralizing Amine or Oxygen Scavenger)', ('Yes','No'), index=1)
-    
-
+def internal_function():
     st.markdown("## Internal Treatment")
     internal = st.radio('Is an Internal Treatment product only required ?', ('Yes','No'), index=0)
-    multipurpose = st.radio('Is a Multipurpose product (Internal + Steam & Condensate) required ?', ('Yes','No'), index=0)
     po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ('Yes','No'), index=0)
+    return (internal, po4)
 
+def amine_function():
+    st.markdown("## Neutralizing amine")
+    n_amine = st.radio('Is Neutralizing Amine treatment required for steam and condensate treatment?', ('Yes','No'), index=0)
+    yellow = st.radio('Is it compatible with Yellow metals ?', ['Yes', 'No'], index=0)
+    dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4','Not Applicable'], index=0)
+    return (n_amine, yellow, dr)
+
+def defoamer_function():
+    st.markdown("## Defoamer")
     defoamer = st.radio('Is a Defoamer required ?', ('Yes','No'), index=1)
+    return defoamer
 
-    st.markdown("## Condensate Treatment (Neutralizing Amine) ")
-
-    n_amine = st.radio('Is Neutralizing Amine treatment required ?', ('Yes','No'), index=0)
-    v_n_amine = st.radio('Is a volatile Oxygen Scavenger and Neutralizing Amine required in the same product ?', ('Yes','No'), index=1)
-    steam = st.radio('Is treatment of Steam & Condensate required?', ('Yes','No'), index=0)
-    yellow = st.selectbox('Is it compatible with Yellow metals ?', ['Yes', 'No'], index=0)
-    dr = st.selectbox('Distribution Ratio of Amines',["Not applicable", '< 2.4', '> 2.4'], index=0)
-
-
-    st.markdown("## Oxygen Scavenger Treatment")
-
-    ox_scav = st.radio('Are there Ox scavengers ?', ('Yes','No'), index=0)
-    passivation = st.radio('Is there Passivation ?', ('Yes','No'), index=1)
+def ox_scav_function():
+    st.markdown("## Oxygen Scavengers")
+    ox_scav = st.radio('Is Oxygen Scavenger required ?', ('Yes','No'), index=0)
+    passivation = st.radio('Is it a Passivation product ?', ('Yes','No'), index=1)
     contains_cat = st.radio('Is there catalyst in the product ?', ('Yes','No'), index=1)
-    submit_button = st.form_submit_button(label='Submit')
+    return (ox_scav, passivation, contains_cat)
+
+st.title('Boiler Product Selector')
+
+opco = st.selectbox('Operating Country (OPCO)', ['USA','China','RSA','LATAM','Canada','EMEA'], index=0)
+op_pres = st.selectbox('Operating Pressure', ('Less than 60 Bar','Between 10 to 60 Bar'), index=0)
+fw = st.selectbox('Feed water quality (RO / Demineralized)', ('All (Raw, RO, Demin)','Raw, RO only'), index=0)
+fda = st.radio('Is it FDA approved for direct food application?',('Yes','No'))
+dairy = st.radio('Is it for Dairy application ?', ('Yes','No'), index=1)
+func_type = st.selectbox('Type of function required',(
+    '---------',
+    'Multi Functional (Internal + Amine + O2)',
+    'Multi Functional (Amine + O2)',
+    'Multi Functional (Internal + Defoamer)',
+    'Single Functional Products'
+),index=0)
+
+
+if func_type=='Multi Functional (Internal + Amine + O2)':
+    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0)
+    
+    defoamer = 'No'
+    internal,po4 = internal_function()
+    n_amine, yellow, dr = amine_function()
+    ox_scav, passivation, contains_cat = ox_scav_function()
+    opco_val = opco_dict[opco]
+    valv = list()
+    valv = valv + opco_val
+    
+    valv.extend(
+        [
+        op_pres_dict[op_pres],
+        fw_dict[fw],
+        fda_dict[fda],
+        dairy_dict[dairy],
+        func_type_dict[func_type],
+        sl_dict[sl],
+        internal_dict[internal],
+        po4_dict[po4],
+        defoamer_dict[defoamer],
+        n_amine_dict[n_amine],
+        yellow_dict[yellow],
+        dr_dict[dr],
+        ox_scav_dict[ox_scav],
+        passivation_dict[passivation],
+        contains_cat_dict[contains_cat],
+        ]
+    )
+    submit_button = st.button(label='Submit')
+
+if func_type=='Multi Functional (Amine + O2)':
+    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0)
+
+    internal = 'No'
+    po4 = 'No'
+    defoamer = 'No'
+    n_amine, yellow, dr = amine_function()
+    ox_scav, passivation, contains_cat = ox_scav_function()
+    opco_val = opco_dict[opco]
+    valv = list()
+    valv = valv + opco_val
+    defoamer = 'No'
+    valv.extend(
+        [
+        op_pres_dict[op_pres],
+        fw_dict[fw],
+        fda_dict[fda],
+        dairy_dict[dairy],
+        func_type_dict[func_type],
+        sl_dict[sl],
+        internal_dict[internal],
+        po4_dict[po4],
+        defoamer_dict[defoamer],
+        n_amine_dict[n_amine],
+        yellow_dict[yellow],
+        dr_dict[dr],
+        ox_scav_dict[ox_scav],
+        passivation_dict[passivation],
+        contains_cat_dict[contains_cat],
+        ]
+    )
+    submit_button = st.button(label='Submit')
+
+        
+if func_type=='Multi Functional (Internal + Defoamer)':
+    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0)
+
+    n_amine = 'No'
+    yellow = "No"
+    dr = "Not Applicable"
+    ox_scav = 'No'
+    passivation = 'No'
+    contains_cat = 'No'
+    internal,po4 = internal_function()
+    defoamer = defoamer_function()
+    opco_val = opco_dict[opco]
+    valv = list()
+    valv = valv + opco_val
+    defoamer = 'No'
+    valv.extend(
+        [
+        op_pres_dict[op_pres],
+        fw_dict[fw],
+        fda_dict[fda],
+        dairy_dict[dairy],
+        func_type_dict[func_type],
+        sl_dict[sl],
+        internal_dict[internal],
+        po4_dict[po4],
+        defoamer_dict[defoamer],
+        n_amine_dict[n_amine],
+        yellow_dict[yellow],
+        dr_dict[dr],
+        ox_scav_dict[ox_scav],
+        passivation_dict[passivation],
+        contains_cat_dict[contains_cat],
+        ]
+    )
+    submit_button = st.button(label='Submit')
+if func_type=='Single Functional Products':
+    master_list = {
+        'valv1': None,
+        'valv2': None,
+        'valv3':None,
+        'valv4':None
+    }
+    # Internal
+    st.markdown("## Internal Treatment")
+    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='1')
+    internal = st.radio('Is an Internal Treatment product only required ?', ('Yes','No'), index=1)
+    po4 = 'No'
+    if internal == 'Yes':
+        po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ('Yes','No'), index=0)
+    opco_val = opco_dict[opco]
+    valv1 = list()
+    valv1 = valv1 + opco_val
+    valv1.extend(
+        [
+        op_pres_dict[op_pres],
+        fw_dict[fw],
+        fda_dict[fda],
+        dairy_dict[dairy],
+        func_type_dict[func_type],
+        sl_dict[sl],
+        internal_dict[internal],
+        po4_dict[po4],
+        defoamer_dict['No'],
+        n_amine_dict['No'],
+        yellow_dict['No'],
+        dr_dict['Not Applicable'],
+        ox_scav_dict['No'],
+        passivation_dict['No'],
+        contains_cat_dict['No'],
+        ]
+    )
+    master_list['valv1'] = valv1
+    # st.write(master_list)
+    # amine
+    st.markdown("## Neutralizing amine")
+    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='2')
+    n_amine = st.radio('Is Neutralizing Amine treatment required for steam and condensate treatment?', ('Yes','No'), index=1)
+    yellow='No'
+    dr = 'Not Applicable'
+    if n_amine == 'Yes':
+        yellow = st.radio('Is it compatible with Yellow metals ?', ['Yes', 'No'], index=0)
+        dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4','Not Applicable'], index=0)
+    opco_val = opco_dict[opco]
+    valv2 = list()
+    valv2 = valv2 + opco_val
+    valv2.extend(
+        [
+        op_pres_dict[op_pres],
+        fw_dict[fw],
+        fda_dict[fda],
+        dairy_dict[dairy],
+        func_type_dict[func_type],
+        sl_dict[sl],
+        internal_dict['No'],
+        po4_dict['No'],
+        defoamer_dict['No'],
+        n_amine_dict[n_amine],
+        yellow_dict[yellow],
+        dr_dict[dr],
+        ox_scav_dict['No'],
+        passivation_dict['No'],
+        contains_cat_dict['No'],
+        ]
+    )
+    master_list['valv2'] = valv2
+    # st.write(master_list)
+    # Defoamer
+    st.markdown("## Defoamer")
+    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='3')
+    defoamer = st.radio('Is a Defoamer required ?', ('Yes','No'), index=1)
+    opco_val = opco_dict[opco]
+    valv3 = list()
+    valv3 = valv3 + opco_val
+    valv3.extend(
+        [
+        op_pres_dict[op_pres],
+        fw_dict[fw],
+        fda_dict[fda],
+        dairy_dict[dairy],
+        func_type_dict[func_type],
+        sl_dict[sl],
+        internal_dict['No'],
+        po4_dict['No'],
+        defoamer_dict[defoamer],
+        n_amine_dict['No'],
+        yellow_dict['No'],
+        dr_dict['Not Applicable'],
+        ox_scav_dict['No'],
+        passivation_dict['No'],
+        contains_cat_dict['No'],
+        ]
+    )
+    master_list['valv3'] = valv3
+    # st.write(master_list)
+    # OX scav 
+    st.markdown("## Oxygen Scavengers")
+    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0,key='4')
+    ox_scav = st.radio('Is Oxygen Scavenger required ?', ('Yes','No'), index=1)
+    passivation='No'
+    contains_cat = 'No'
+    if ox_scav=='Yes':
+        passivation = st.radio('Is it a Passivation product ?', ('Yes','No'), index=1)
+        contains_cat = st.radio('Is there catalyst in the product ?', ('Yes','No'), index=1)
+    opco_val = opco_dict[opco]
+    valv4 = list()
+    valv4 = valv4 + opco_val
+    valv4.extend(
+        [
+        op_pres_dict[op_pres],
+        fw_dict[fw],
+        fda_dict[fda],
+        dairy_dict[dairy],
+        func_type_dict[func_type],
+        sl_dict[sl],
+        internal_dict['No'],
+        po4_dict['No'],
+        defoamer_dict['No'],
+        n_amine_dict['No'],
+        yellow_dict['No'],
+        dr_dict['Not Applicable'],
+        ox_scav_dict[ox_scav],
+        passivation_dict[passivation],
+        contains_cat_dict[contains_cat],
+        ]
+    )
+    master_list['valv4'] = valv4
+    # st.write(master_list)
+    submit_button = st.button(label='Submit')
+
 if submit_button:
-    dset = pd.read_csv('Test_v2refine.csv')
-    X = dset.drop(columns=['A2'])
-    y = dset.A2
+    dset = pd.read_csv('Test_v4refine.csv')
+    X = dset.drop(columns=['V'])
+    y = dset['V']
     X_train = X
     y_train = y
     clf = tree.DecisionTreeClassifier(max_depth=100)
     clf.fit(X_train,y_train)
-    valv = list()
-    opco_val = opco_dict[opco]
-    for val in opco_val:
-        valv.append(val)
-    valv.extend(
-        [psig1_dict[psig1],
-        psig2_dict[psig2],
-        sa_dict[sa],
-        fw_dict[fw],
-        internal_dict[internal],
-        multipurpose_dict[multipurpose],
-        sl_form_dict[sl_form],
-        # co_ord_dict[co_ord],
-        po4_dict[po4],
-        # cpo4_dict[cpo4],
-        # all_poly_dict[all_poly],
-        # na_po4_dict[na_po4],
-        dairy_dict[dairy],
-        food_dict[food],
-        fda_dict[fda],
-        defoamer_dict[defoamer],
-        avt_dict[avt],
-        n_amine_dict[n_amine],
-        v_n_amine_dict[v_n_amine],
-        steam_dict[steam],
-        # turbine_dict[turbine],
-        yellow_dict[yellow],
-        dr_dict[dr],
-        # f_amine_dict[f_amine],
-        # tot_amine_dict[tot_amine],
-        ox_scav_dict[ox_scav],
-        contains_cat_dict[contains_cat],
-        passivation_dict[passivation] 
-        ]
-    )
-    
-    # print('=================')
-    # print(X.values.tolist()[0])
-    # print(valv)
-    m = [valv==i for i in X.values.tolist()]
-    print(m)
-    if any(m):
-        valv_df = pd.DataFrame(valv).transpose()
-        valv_df.columns = X.columns
-        pred_ui = clf.predict(valv_df)
-        print(pred_ui)
-        st.success(f'The product for the following configuration is {pred_ui}')
+    if func_type !='Single Functional Products':
+        m = [valv==i for i in X.values.tolist()]
+        print(m)
+        if any(m):
+            valv_df = pd.DataFrame(valv).transpose()
+            valv_df.columns = X.columns
+            pred_ui = clf.predict(valv_df)
+            print(pred_ui)
+            st.success(f'The product for the following configuration is {pred_ui}')
+        else:
+            print('Not here')
+            st.error('''
+            We could not find a product for such an input combination :( 
+            Please re-check the i/p condition or parameters!
+            ''')
+        # st.write(valv)
     else:
-        print('Not here')
-        st.error('''
-        We could not find a product for such an input combination :( 
-        Please re-check the i/p condition or parameters!
-        ''')
+        # st.write(master_list)
+        final_prods = list()
+        for key,val in master_list.items():
+            st.write(f'checking {key}')
+            valv = master_list[key]
+            m = [valv==i for i in X.values.tolist()]
+            if any(m):
+                valv_df = pd.DataFrame(valv).transpose()
+                valv_df.columns = X.columns
+                pred_ui = clf.predict(valv_df)
+                final_prods.extend(pred_ui)
+                # st.write(f'found {key}')
+                
+        if len(final_prods) < 1:
+            st.error('''
+            We could not find a product for such an input combination :( 
+            Please re-check the i/p condition or parameters!
+            ''')
+        else:
+            final_prods_res = ', '.join(final_prods)
+            st.success(f'The product(s) for the above configuration is/are {final_prods_res}')
+            
