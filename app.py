@@ -158,128 +158,129 @@ if func_type=='Single Functional Products':
     }
     # Internal
     st.markdown("## Internal Treatment")
-    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='1')
     internal = st.radio('Is an Internal Treatment product only required ?', ('Yes','No'), index=1)
-    po4 = 'No'
+    # po4 = 'No'
     if internal == 'Yes':
+        sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='1')
         po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ('Yes','No'), index=0)
-    opco_val = opco_dict[opco]
-    valv1 = list()
-    valv1 = valv1 + opco_val
-    valv1.extend(
-        [
-        op_pres_dict[op_pres],
-        fw_dict[fw],
-        fda_dict[fda],
-        dairy_dict[dairy],
-        func_type_dict[func_type],
-        sl_dict[sl],
-        internal_dict[internal],
-        po4_dict[po4],
-        defoamer_dict['No'],
-        n_amine_dict['No'],
-        yellow_dict['No'],
-        dr_dict['Not Applicable'],
-        ox_scav_dict['No'],
-        passivation_dict['No'],
-        contains_cat_dict['No'],
-        ]
-    )
-    master_list['valv1'] = valv1
+        opco_val = opco_dict[opco]
+        valv1 = list()
+        valv1 = valv1 + opco_val
+        valv1.extend(
+            [
+            op_pres_dict[op_pres],
+            fw_dict[fw],
+            fda_dict[fda],
+            dairy_dict[dairy],
+            func_type_dict[func_type],
+            sl_dict[sl],
+            internal_dict[internal],
+            po4_dict[po4],
+            defoamer_dict['No'],
+            n_amine_dict['No'],
+            yellow_dict['No'],
+            dr_dict['Not Applicable'],
+            ox_scav_dict['No'],
+            passivation_dict['No'],
+            contains_cat_dict['No'],
+            ]
+        )
+        master_list['valv1'] = valv1
     # st.write(master_list)
     # amine
     st.markdown("## Neutralizing amine")
-    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='2')
     n_amine = st.radio('Is Neutralizing Amine treatment required for steam and condensate treatment?', ('Yes','No'), index=1)
-    yellow='No'
-    dr = 'Not Applicable'
+    # yellow='No'
+    # dr = 'Not Applicable'
     if n_amine == 'Yes':
+        sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='2')
         yellow = st.radio('Is it compatible with Yellow metals ?', ['Yes', 'No'], index=0)
         dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4','Not Applicable'], index=0)
-    opco_val = opco_dict[opco]
-    valv2 = list()
-    valv2 = valv2 + opco_val
-    valv2.extend(
-        [
-        op_pres_dict[op_pres],
-        fw_dict[fw],
-        fda_dict[fda],
-        dairy_dict[dairy],
-        func_type_dict[func_type],
-        sl_dict[sl],
-        internal_dict['No'],
-        po4_dict['No'],
-        defoamer_dict['No'],
-        n_amine_dict[n_amine],
-        yellow_dict[yellow],
-        dr_dict[dr],
-        ox_scav_dict['No'],
-        passivation_dict['No'],
-        contains_cat_dict['No'],
-        ]
-    )
-    master_list['valv2'] = valv2
+        opco_val = opco_dict[opco]
+        valv2 = list()
+        valv2 = valv2 + opco_val
+        valv2.extend(
+            [
+            op_pres_dict[op_pres],
+            fw_dict[fw],
+            fda_dict[fda],
+            dairy_dict[dairy],
+            func_type_dict[func_type],
+            sl_dict[sl],
+            internal_dict['No'],
+            po4_dict['No'],
+            defoamer_dict['No'],
+            n_amine_dict[n_amine],
+            yellow_dict[yellow],
+            dr_dict[dr],
+            ox_scav_dict['No'],
+            passivation_dict['No'],
+            contains_cat_dict['No'],
+            ]
+        )
+        master_list['valv2'] = valv2
     # st.write(master_list)
     # Defoamer
     st.markdown("## Defoamer")
-    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='3')
     defoamer = st.radio('Is a Defoamer required ?', ('Yes','No'), index=1)
-    opco_val = opco_dict[opco]
-    valv3 = list()
-    valv3 = valv3 + opco_val
-    valv3.extend(
-        [
-        op_pres_dict[op_pres],
-        fw_dict[fw],
-        fda_dict[fda],
-        dairy_dict[dairy],
-        func_type_dict[func_type],
-        sl_dict[sl],
-        internal_dict['No'],
-        po4_dict['No'],
-        defoamer_dict[defoamer],
-        n_amine_dict['No'],
-        yellow_dict['No'],
-        dr_dict['Not Applicable'],
-        ox_scav_dict['No'],
-        passivation_dict['No'],
-        contains_cat_dict['No'],
-        ]
-    )
-    master_list['valv3'] = valv3
+    if defoamer == 'Yes':
+        sl = st.radio('Is a Solid/Liquid product required?', ['Liquid'], key='3')
+        opco_val = opco_dict[opco]
+        valv3 = list()
+        valv3 = valv3 + opco_val
+        valv3.extend(
+            [
+            op_pres_dict[op_pres],
+            fw_dict[fw],
+            fda_dict[fda],
+            dairy_dict[dairy],
+            func_type_dict[func_type],
+            sl_dict[sl],
+            internal_dict['No'],
+            po4_dict['No'],
+            defoamer_dict[defoamer],
+            n_amine_dict['No'],
+            yellow_dict['No'],
+            dr_dict['Not Applicable'],
+            ox_scav_dict['No'],
+            passivation_dict['No'],
+            contains_cat_dict['No'],
+            ]
+        )
+        master_list['valv3'] = valv3
     # st.write(master_list)
     # OX scav 
     st.markdown("## Oxygen Scavengers")
-    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0,key='4')
     ox_scav = st.radio('Is Oxygen Scavenger required ?', ('Yes','No'), index=1)
     passivation='No'
     contains_cat = 'No'
     if ox_scav=='Yes':
+        sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0,key='4')
         passivation = st.radio('Is it a Passivation product ?', ('Yes','No'), index=1)
         contains_cat = st.radio('Is there catalyst in the product ?', ('Yes','No'), index=1)
-    opco_val = opco_dict[opco]
-    valv4 = list()
-    valv4 = valv4 + opco_val
-    valv4.extend(
-        [
-        op_pres_dict[op_pres],
-        fw_dict[fw],
-        fda_dict[fda],
-        dairy_dict[dairy],
-        func_type_dict[func_type],
-        sl_dict[sl],
-        internal_dict['No'],
-        po4_dict['No'],
-        defoamer_dict['No'],
-        n_amine_dict['No'],
-        yellow_dict['No'],
-        dr_dict['Not Applicable'],
-        ox_scav_dict[ox_scav],
-        passivation_dict[passivation],
-        contains_cat_dict[contains_cat],
-        ]
-    )
-    master_list['valv4'] = valv4
+        opco_val = opco_dict[opco]
+        valv4 = list()
+        valv4 = valv4 + opco_val
+        valv4.extend(
+            [
+            op_pres_dict[op_pres],
+            fw_dict[fw],
+            fda_dict[fda],
+            dairy_dict[dairy],
+            func_type_dict[func_type],
+            sl_dict[sl],
+            internal_dict['No'],
+            po4_dict['No'],
+            defoamer_dict['No'],
+            n_amine_dict['No'],
+            yellow_dict['No'],
+            dr_dict['Not Applicable'],
+            ox_scav_dict[ox_scav],
+            passivation_dict[passivation],
+            contains_cat_dict[contains_cat],
+            ]
+        )
+        master_list['valv4'] = valv4
     # st.write(master_list)
     submit_button = st.button(label='Submit')
 
@@ -311,22 +312,27 @@ if submit_button:
         # st.write(master_list)
         final_prods = list()
         for key,val in master_list.items():
-            # st.write(f'checking {key}')
             valv = master_list[key]
-            m = [valv==i for i in X.values.tolist()]
-            if any(m):
-                valv_df = pd.DataFrame(valv).transpose()
-                valv_df.columns = X.columns
-                pred_ui = clf.predict(valv_df)
-                final_prods.extend(pred_ui)
-                # st.write(f'found {key}')
+            if valv != None:
+                # st.write(f'checking {key}')
+                m = [valv==i for i in X.values.tolist()]
+                if any(m):
+                    valv_df = pd.DataFrame(valv).transpose()
+                    valv_df.columns = X.columns
+                    pred_ui = clf.predict(valv_df)
+                    final_prods.extend(pred_ui)
+                    # st.write(f'found {key}')
                 
         if len(final_prods) < 1:
             st.error('''
             We could not find a product for such an input combination :( 
-            Please re-check the i/p condition or parameters!
+            Please re-check the input condition or parameters!
             ''')
         else:
             final_prods_res = ', '.join(final_prods)
             st.success(f'The product(s) for the above configuration is/are {final_prods_res}')
-            
+
+
+    
+
+   
