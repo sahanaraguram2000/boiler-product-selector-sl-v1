@@ -311,7 +311,7 @@ if submit_button:
         # st.write(master_list)
         final_prods = list()
         for key,val in master_list.items():
-            st.write(f'checking {key}')
+            # st.write(f'checking {key}')
             valv = master_list[key]
             m = [valv==i for i in X.values.tolist()]
             if any(m):
