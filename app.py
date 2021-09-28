@@ -38,7 +38,7 @@ opco = st.selectbox('Operating Country (OPCO)', ['USA','China','RSA','LATAM','Ca
 op_pres = st.selectbox('Operating Pressure', ('Less than 60 Bar','Between 10 to 60 Bar'), index=0)
 fw = st.selectbox('Feed water quality (RO / Demineralized)', ('All (Raw, RO, Demin)','Raw, RO only'), index=0)
 fda = st.radio('Is it FDA approved for direct food application?',('Yes','No'))
-dairy = st.radio('Is it for Dairy application ?', ('Yes','No'), index=1)
+dairy = st.radio('Is it for Dairy application ?', ('Yes','No'), index=0)
 func_type = st.selectbox('Type of function required',(
     '---------',
     'Multi Functional (Internal + Amine + O2)',
@@ -128,7 +128,6 @@ if func_type=='Multi Functional (Internal + Defoamer)':
     opco_val = opco_dict[opco]
     valv = list()
     valv = valv + opco_val
-    defoamer = 'No'
     valv.extend(
         [
         op_pres_dict[op_pres],
@@ -295,6 +294,7 @@ if submit_button:
     if func_type !='Single Functional Products':
         m = [valv==i for i in X.values.tolist()]
         print(m)
+        st.write(valv)
         if any(m):
             valv_df = pd.DataFrame(valv).transpose()
             valv_df.columns = X.columns
