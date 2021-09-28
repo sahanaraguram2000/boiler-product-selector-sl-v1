@@ -55,7 +55,8 @@ n_amine_dict = {
 }
 yellow_dict = {
     'No':0,
-    'Yes':1
+    'Yes':1,
+    'Not Applicable':2
 }
 dr_dict = {
     '< 2.4':1,
