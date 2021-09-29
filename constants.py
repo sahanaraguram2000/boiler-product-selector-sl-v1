@@ -8,7 +8,7 @@ opco_dict = {
     'EMEA' : [0,0,0,0,0,1]
 }
 op_pres_dict={
-    'Less than 60 Bar': 1,
+    'Less than 10 Bar': 1,
     'Between 10 to 60 Bar': 2
 }
 
