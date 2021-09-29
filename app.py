@@ -5,29 +5,34 @@ from constants import *
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import tree
 from sklearn import metrics
+
 submit_button=None
 
 def internal_function():
     st.markdown("## Internal Treatment")
-    internal = st.radio('Is an Internal Treatment product only required ?', ('Yes','No'), index=0)
+    # internal = st.radio('Is an Internal Treatment product only required ?', ('Yes','No'), index=0)
+    internal = 'Yes'
     po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ('Yes','No'), index=0)
     return (internal, po4)
 
 def amine_function():
     st.markdown("## Neutralizing amine")
-    n_amine = st.radio('Is Neutralizing Amine treatment required for steam and condensate treatment?', ('Yes','No'), index=0)
+    # n_amine = st.radio('Is Neutralizing Amine treatment required for steam and condensate treatment?', ('Yes','No'), index=0)
+    n_amine = 'Yes'
     yellow = st.radio('Is it compatible with Yellow metals ?', ['Yes', 'No'], index=0)
     dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4','Not Applicable'], index=0)
     return (n_amine, yellow, dr)
 
 def defoamer_function():
-    st.markdown("## Defoamer")
-    defoamer = st.radio('Is a Defoamer required ?', ('Yes','No'), index=1)
+    # st.markdown("## Defoamer")
+    # defoamer = st.radio('Is a Defoamer required ?', ('Yes','No'), index=1)
+    defoamer = 'Yes'
     return defoamer
 
 def ox_scav_function():
     st.markdown("## Oxygen Scavengers")
-    ox_scav = st.radio('Is Oxygen Scavenger required ?', ('Yes','No'), index=0)
+    # ox_scav = st.radio('Is Oxygen Scavenger required ?', ('Yes','No'), index=0)
+    ox_scav = 'Yes'
     passivation = st.radio('Is it a Passivation product ?', ('Yes','No'), index=1)
     contains_cat = st.radio('Is there catalyst in the product ?', ('Yes','No'), index=1)
     return (ox_scav, passivation, contains_cat)
@@ -35,7 +40,7 @@ def ox_scav_function():
 st.title('Boiler Product Selector')
 
 opco = st.selectbox('Operating Country (OPCO)', ['USA','China','RSA','LATAM','Canada','EMEA'], index=0)
-op_pres = st.selectbox('Operating Pressure', ('Less than 60 Bar','Between 10 to 60 Bar'), index=0)
+op_pres = st.selectbox('Operating Pressure', ('Less than 10 Bar','Between 10 to 60 Bar'), index=0)
 fw = st.selectbox('Feed water quality (RO / Demineralized)', ('All (Raw, RO, Demin)','Raw, RO only'), index=0)
 fda = st.radio('Is it FDA approved for direct food application?',('Yes','No'))
 dairy = st.radio('Is it for Dairy application ?', ('Yes','No'), index=0)
@@ -115,7 +120,7 @@ if func_type=='Multi Functional (Amine + O2)':
 
         
 if func_type=='Multi Functional (Internal + Defoamer)':
-    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0)
+    sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=1)
 
     n_amine = 'No'
     yellow = "No"
@@ -331,8 +336,3 @@ if submit_button:
         else:
             final_prods_res = ', '.join(final_prods)
             st.success(f'The product(s) for the above configuration is/are {final_prods_res}')
-
-
-    
-
-   
