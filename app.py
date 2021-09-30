@@ -299,7 +299,7 @@ if submit_button:
     if func_type !='Single Functional Products':
         m = [valv==i for i in X.values.tolist()]
         print(m)
-#         st.write(valv)
+        st.write(valv)
         if any(m):
             valv_df = pd.DataFrame(valv).transpose()
             valv_df.columns = X.columns
@@ -316,6 +316,13 @@ if submit_button:
     else:
         # st.write(master_list)
         final_prods = list()
+        final_prods_keys = [
+            'Internal treatment',
+            'Neutralizing amine',
+            'Defoamer',
+            'Oxygen Scavengers'
+
+        ]
         for key,val in master_list.items():
             valv = master_list[key]
             if valv != None:
@@ -326,13 +333,27 @@ if submit_button:
                     valv_df.columns = X.columns
                     pred_ui = clf.predict(valv_df)
                     final_prods.extend(pred_ui)
+                else:
+                    final_prods.extend(['No product found'])
                     # st.write(f'found {key}')
-                
+            else:
+                final_prods.extend(['No product found'])
+
+        final_zip = list(zip(final_prods,final_prods_keys))
+        final_dict = {}
+        for val,key in final_zip:
+            final_dict[key] = [val]
+        final_df = pd.DataFrame(final_dict).T
+        final_df.columns = ['Products']
+            
+
         if len(final_prods) < 1:
             st.error('''
             We could not find a product for such an input combination :( 
             Please re-check the input condition or parameters!
             ''')
         else:
-            final_prods_res = ', '.join(final_prods)
-            st.success(f'The product(s) for the above configuration is/are {final_prods_res}')
+            # final_prods_res = ', '.join(final_prods)
+            st.success(f'''The product(s) for the above configuration is/are ''')
+            # st.write(pd.DataFrame(final_dict).T)
+            st.write(final_df)
