@@ -7,6 +7,7 @@ from sklearn import tree
 from sklearn import metrics
 
 submit_button=None
+dset = pd.read_csv('Test_v4refine.csv')
 
 def internal_function():
     st.markdown("## Internal Treatment")
@@ -20,6 +21,8 @@ def amine_function():
     # n_amine = st.radio('Is Neutralizing Amine treatment required for steam and condensate treatment?', ('Yes','No'), index=0)
     n_amine = 'Yes'
     yellow = st.radio('Is it compatible with Yellow metals ?', ['Yes', 'No'], index=0)
+    if yellow == 'Yes':
+        dset['Q']=dset['Q'].replace({0:1})
     dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4','Not Applicable'], index=0)
     return (n_amine, yellow, dr)
 
@@ -40,10 +43,36 @@ def ox_scav_function():
 st.title('Boiler Product Selector')
 
 opco = st.selectbox('Operating Country (OPCO)', ['USA','China','RSA','LATAM','Canada','EMEA'], index=0)
-op_pres = st.selectbox('Operating Pressure', ('Less than 10 Bar','Between 10 to 60 Bar'), index=0)
-fw = st.selectbox('Feed water quality (RO / Demineralized)', ('All (Raw, RO, Demin)','Raw, RO only'), index=0)
+opco_pres_1 = st.slider('Operating Pressure',min_value=0, max_value=60)
+if opco_pres_1 < 10:
+    op_pres = 'Less than 60 Bar'
+    # dset['G'] = dset['G'].replace({2:1})
+else:
+    op_pres = 'Between 10 to 60 Bar'
+    dset['G'] = dset['G'].replace({1:2})
+# op_pres_1 = st.radio('Is the pressure less than 60 bar and between 10 and 60?', ('Yes','No'), index=0)
+# if op_pres_1=='Yes':
+#     op_pres = 'Less than 10 Bar'
+# else:
+#     op_pres_2 = st.radio('Is the pressure less than 60 bar?', ('Yes','No'), index=0)
+#     if op_pres_2 == 'Yes':
+#         op_pres = 'Less than 10 Bar'
+#     else:
+#         st.warning('''
+#             The product selector is only for low pressure boilers less than 60 bars.
+#             ''')
+fw = st.selectbox('Feed water quality (RO / Demineralized)', ('All (Raw, RO, Demin)','Raw, RO Only'), index=0)
+if fw=='All (Raw, RO, Demin)':
+    dset['H'] = dset['H'].replace({2:1})
+    fw='All (Raw, RO, Demin)'
 fda = st.radio('Is it FDA approved for direct food application?',('Yes','No'))
+if fda == 'No':
+    dset['I'] = dset['I'].replace({0:1})
+    fda = 'Yes'
 dairy = st.radio('Is it for Dairy application ?', ('Yes','No'), index=0)
+if dairy == 'No':
+    dset['J'] = dset['J'].replace({0:1})
+    dairy = 'Yes'
 func_type = st.selectbox('Type of function required',(
     '---------',
     'Multi Functional (Internal + Amine + O2)',
@@ -51,7 +80,6 @@ func_type = st.selectbox('Type of function required',(
     'Multi Functional (Internal + Defoamer)',
     'Single Functional Products'
 ),index=0)
-
 
 if func_type=='Multi Functional (Internal + Amine + O2)':
     sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0)
@@ -199,6 +227,8 @@ if func_type=='Single Functional Products':
     if n_amine == 'Yes':
         sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='2')
         yellow = st.radio('Is it compatible with Yellow metals ?', ['Yes', 'No'], index=0)
+        if yellow == 'Yes':
+            dset['Q']=dset['Q'].replace({0:1})
         dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4','Not Applicable'], index=0)
         opco_val = opco_dict[opco]
         valv2 = list()
@@ -289,7 +319,6 @@ if func_type=='Single Functional Products':
     submit_button = st.button(label='Submit')
 
 if submit_button:
-    dset = pd.read_csv('Test_v4refine.csv')
     X = dset.drop(columns=['V'])
     y = dset['V']
     X_train = X
@@ -299,7 +328,7 @@ if submit_button:
     if func_type !='Single Functional Products':
         m = [valv==i for i in X.values.tolist()]
         print(m)
-#         st.write(valv)
+        st.write(valv)
         if any(m):
             valv_df = pd.DataFrame(valv).transpose()
             valv_df.columns = X.columns
@@ -310,7 +339,7 @@ if submit_button:
             print('Not here')
             st.error('''
             We could not find a product for such an input combination :( 
-            Please re-check the i/p condition or parameters!
+            Please re-check the input condition or parameters!
             ''')
         # st.write(valv)
     else:
@@ -357,3 +386,8 @@ if submit_button:
             st.success(f'''The product(s) for the above configuration is/are ''')
             # st.write(pd.DataFrame(final_dict).T)
             st.write(final_df)
+
+
+    
+
+   
