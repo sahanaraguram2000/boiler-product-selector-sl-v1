@@ -8,14 +8,14 @@ opco_dict = {
     'EMEA' : [0,0,0,0,0,1]
 }
 op_pres_dict={
-    'Less than 10 Bar': 1,
+    'Less than 60 Bar': 1,
     'Between 10 to 60 Bar': 2
 }
 
 
 fw_dict = {
     'All (Raw, RO, Demin)':1,
-    'Raw, RO only':2
+    'Raw, RO Only':2
 }
 
 fda_dict ={
@@ -56,7 +56,6 @@ n_amine_dict = {
 yellow_dict = {
     'No':0,
     'Yes':1,
-    'Not Applicable':2
 }
 dr_dict = {
     '< 2.4':1,
