@@ -14,8 +14,8 @@ op_pres_dict={
 
 
 fw_dict = {
-    'All (Raw, RO, Demin)':1,
-    'Raw, RO Only':2
+    'All (Raw/RO/Demineralized)':1, # 1 -> All(Raw/Ro/Demin)
+    'Raw, RO Only':2 #2 -> Raw and RO only
 }
 
 fda_dict ={
