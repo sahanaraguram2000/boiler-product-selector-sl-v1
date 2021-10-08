@@ -333,7 +333,7 @@ if submit_button:
     if func_type !='Single Functional Products':
         m = [valv==i for i in X.values.tolist()]
         print(m)
-        st.write(valv)
+#         st.write(valv)
         if any(m):
             valv_df = pd.DataFrame(valv).transpose()
             valv_df.columns = X.columns
