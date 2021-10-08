@@ -20,9 +20,9 @@ def amine_function():
     st.markdown("## Neutralizing amine")
     # n_amine = st.radio('Is Neutralizing Amine treatment required for steam and condensate treatment?', ('Yes','No'), index=0)
     n_amine = 'Yes'
-    yellow = st.radio('Is it compatible with Yellow metals ?', ['Yes', 'No'], index=0)
-    if yellow == 'Yes':
-        dset['Q']=dset['Q'].replace({0:1})
+    yellow = st.radio('Is there Yellow metal in the system?', ['Yes', 'No'], index=0)
+    if yellow == 'No':
+        dset['Q']=dset['Q'].replace({1:0})
     dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4','Not Applicable'], index=0)
     return (n_amine, yellow, dr)
 
@@ -36,14 +36,14 @@ def ox_scav_function():
     st.markdown("## Oxygen Scavengers")
     # ox_scav = st.radio('Is Oxygen Scavenger required ?', ('Yes','No'), index=0)
     ox_scav = 'Yes'
-    passivation = st.radio('Is it a Passivation product ?', ('Yes','No'), index=1)
-    contains_cat = st.radio('Is there catalyst in the product ?', ('Yes','No'), index=1)
+    passivation = st.radio('Is Passivation Required?', ('Yes','No'), index=1)
+    contains_cat = st.radio('Is a product that contains catalyst required ?', ('Yes','No'), index=1)
     return (ox_scav, passivation, contains_cat)
 
 st.title('Boiler Product Selector')
 
 opco = st.selectbox('Operating Country (OPCO)', ['USA','China','RSA','LATAM','Canada','EMEA'], index=0)
-opco_pres_1 = st.slider('Operating Pressure',min_value=0, max_value=60)
+opco_pres_1 = st.slider('Operating Pressure (bar)',min_value=0, max_value=60)
 if opco_pres_1 < 10:
     op_pres = 'Less than 60 Bar'
     # dset['G'] = dset['G'].replace({2:1})
@@ -61,11 +61,15 @@ else:
 #         st.warning('''
 #             The product selector is only for low pressure boilers less than 60 bars.
 #             ''')
-fw = st.selectbox('Feed water quality (RO / Demineralized)', ('All (Raw, RO, Demin)','Raw, RO Only'), index=0)
-if fw=='All (Raw, RO, Demin)':
-    dset['H'] = dset['H'].replace({2:1})
-    fw='All (Raw, RO, Demin)'
-fda = st.radio('Is it FDA approved for direct food application?',('Yes','No'))
+fw = st.selectbox('Feed Water Quality', ('All (Raw/RO/Demineralized)', 'Raw, RO Only'), index=0)
+if fw=='Raw, RO Only':
+    dset['H'] = dset['H'].replace({1:2})
+    # fw='All (Raw, RO, Demin)'
+# check1 = st.checkbox('Raw')
+# check2 = st.checkbox('RO')
+# check3 = st.checkbox('Demin')
+
+fda = st.radio('Is an FDA approved product for direct food application required? ',('Yes','No'))
 if fda == 'No':
     dset['I'] = dset['I'].replace({0:1})
     fda = 'Yes'
@@ -190,7 +194,7 @@ if func_type=='Single Functional Products':
     }
     # Internal
     st.markdown("## Internal Treatment")
-    internal = st.radio('Is an Internal Treatment product only required ?', ('Yes','No'), index=1)
+    internal = st.radio('Is Internal treatment required?', ('Yes','No'), index=1)
     # po4 = 'No'
     if internal == 'Yes':
         sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='1')
@@ -226,9 +230,9 @@ if func_type=='Single Functional Products':
     # dr = 'Not Applicable'
     if n_amine == 'Yes':
         sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='2')
-        yellow = st.radio('Is it compatible with Yellow metals ?', ['Yes', 'No'], index=0)
-        if yellow == 'Yes':
-            dset['Q']=dset['Q'].replace({0:1})
+        yellow = st.radio('Is there Yellow metal in the system?', ['Yes', 'No'], index=0)
+        if yellow == 'No':
+            dset['Q']=dset['Q'].replace({1:0})
         dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4','Not Applicable'], index=0)
         opco_val = opco_dict[opco]
         valv2 = list()
@@ -258,7 +262,8 @@ if func_type=='Single Functional Products':
     st.markdown("## Defoamer")
     defoamer = st.radio('Is a Defoamer required ?', ('Yes','No'), index=1)
     if defoamer == 'Yes':
-        sl = st.radio('Is a Solid/Liquid product required?', ['Liquid'], key='3')
+        # sl = st.radio('Is a Solid/Liquid product required?', ['Liquid'], key='3')
+        sl = 'Liquid'
         opco_val = opco_dict[opco]
         valv3 = list()
         valv3 = valv3 + opco_val
@@ -290,8 +295,8 @@ if func_type=='Single Functional Products':
     contains_cat = 'No'
     if ox_scav=='Yes':
         sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0,key='4')
-        passivation = st.radio('Is it a Passivation product ?', ('Yes','No'), index=1)
-        contains_cat = st.radio('Is there catalyst in the product ?', ('Yes','No'), index=1)
+        passivation = st.radio('Is Passivation Required?', ('Yes','No'), index=1)
+        contains_cat = st.radio('Is a product that contains catalyst required?', ('Yes','No'), index=1)
         opco_val = opco_dict[opco]
         valv4 = list()
         valv4 = valv4 + opco_val
@@ -386,8 +391,3 @@ if submit_button:
             st.success(f'''The product(s) for the above configuration is/are ''')
             # st.write(pd.DataFrame(final_dict).T)
             st.write(final_df)
-
-
-    
-
-   
