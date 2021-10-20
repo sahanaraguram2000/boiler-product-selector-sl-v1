@@ -1,3 +1,12 @@
+
+# Users are put here in the format of 'username':'password'
+users = {
+    'Firestorm':'Buckman123'
+}
+
+
+
+
 #Encoders are put here
 opco_dict = {
     'USA' : [1,0,0,0,0,0],
