@@ -333,7 +333,7 @@ def product_selector():
         if func_type !='Single Functional Products':
             m = [valv==i for i in X.values.tolist()]
             print(m)
-            st.write(valv)
+            # st.write(valv)
             if any(m):
                 valv_df = pd.DataFrame(valv).transpose()
                 valv_df.columns = X.columns
@@ -396,12 +396,12 @@ st.title('Boiler Product Selector')
 st.sidebar.title('Authentication')
 uname = st.sidebar.text_input('Username')
 passw = st.sidebar.text_input('Password', type="password")
-auth_sbmt = st.sidebar.button('Submit')
+auth_sbmt = st.sidebar.checkbox('Login')
 if auth_sbmt:
     if uname in users:
         if passw == users[uname]:
-            st.success(f'Logged in as {uname}')
-            st.balloons()
+            st.info(f'Logged in as {uname}')
+            # st.balloons()
             product_selector()
         else:
             st.sidebar.warning('User exists but password is wrong. Please re-check your password')
