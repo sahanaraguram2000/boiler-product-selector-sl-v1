@@ -9,74 +9,103 @@ from sklearn import metrics
 
 dset = pd.read_csv('Test_v4refine.csv')
 
-def internal_function():
+def compareList(l1, l2):
+    return [i==j for i, j in zip(l1, l2)]
+# ---------------------------------------------------------------------------------
+# Internal Function which takes all the inputs for the Interal treatment - Only used for Multiple products
+# ---------------------------------------------------------------------------------
+
+def internal_function(func_type):
     st.markdown("## Internal Treatment")
     # internal = st.radio('Is an Internal Treatment product only required ?', ('Yes','No'), index=0)
     internal = 'Yes'
-    po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ('Yes','No'), index=0)
+    if func_type == 'Multi Functional (Internal + Amine + O2)' or func_type == 'Multi Functional (Internal + Defoamer)':
+        po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ['Yes'])
+    else:
+        po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ('Yes','No'), index=0)
     return (internal, po4)
 
-def amine_function():
+# ---------------------------------------------------------------------------------
+# Amine Function which takes all the inputs for the Amine treatment - Only used for Multiple products
+# ---------------------------------------------------------------------------------
+
+def amine_function(func_type):
     st.markdown("## Neutralizing amine")
     # n_amine = st.radio('Is Neutralizing Amine treatment required for steam and condensate treatment?', ('Yes','No'), index=0)
     n_amine = 'Yes'
     yellow = st.radio('Is there Yellow metal in the system?', ['Yes', 'No'], index=0)
     if yellow == 'No':
         dset['Q']=dset['Q'].replace({1:0})
-    dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4','Not Applicable'], index=0)
+    if func_type == 'Multi Functional (Internal + Amine + O2)':
+        dr = st.selectbox('Distribution ratio', ['< 2.4'])
+    else:
+        dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4'], index=0)
     return (n_amine, yellow, dr)
 
-def defoamer_function():
+# ---------------------------------------------------------------------------------
+# Defoamer Function which takes all the inputs for the Defoamer treatment - Only used for Multiple products
+# ---------------------------------------------------------------------------------
+
+
+def defoamer_function(func_type):
     # st.markdown("## Defoamer")
     # defoamer = st.radio('Is a Defoamer required ?', ('Yes','No'), index=1)
     defoamer = 'Yes'
     return defoamer
+# ---------------------------------------------------------------------------------
+# Oxygen Function which takes all the inputs for the Oxygen Scavenger treatment - Only used for Multiple products
+# ---------------------------------------------------------------------------------
 
-def ox_scav_function():
+def ox_scav_function(func_type,solid_req):
     st.markdown("## Oxygen Scavengers")
     # ox_scav = st.radio('Is Oxygen Scavenger required ?', ('Yes','No'), index=0)
     ox_scav = 'Yes'
-    passivation = st.radio('Is Passivation Required?', ('Yes','No'), index=1)
-    contains_cat = st.radio('Is a product that contains catalyst required ?', ('Yes','No'), index=1)
+    if func_type == 'Multi Functional (Internal + Amine + O2)':
+        passivation = st.radio('Is Passivation Required?', ['No'])
+    elif func_type == 'Multi Functional (Amine + O2)':
+        passivation = st.radio('Is Passivation Required?', ['Yes'])
+    else:
+        passivation = st.radio('Is Passivation Required?', ('Yes','No'), index=1)
+    if (solid_req == 'Solid') or (func_type == 'Multi Functional (Internal + Amine + O2)'):
+        contains_cat = st.radio('Is a product that contains catalyst required ?', ['No'])
+
+    else:
+        contains_cat = st.radio('Is a product that contains catalyst required ?', ('Yes','No'), index=1)
     return (ox_scav, passivation, contains_cat)
+
+# --------------------------------------------
+# The main product selector function which contains the entire logic of the app.
+# --------------------------------------------
 
 def product_selector():
     submit_button=None
+    #OPCO
     opco = st.selectbox('Operating Country (OPCO)', ['USA','China','RSA','LATAM','Canada','EMEA'], index=0)
     opco_pres_1 = st.slider('Operating Pressure (bar)',min_value=0, max_value=60)
     if opco_pres_1 < 10:
         op_pres = 'Less than 60 Bar'
-        # dset['G'] = dset['G'].replace({2:1})
     else:
         op_pres = 'Between 10 to 60 Bar'
         dset['G'] = dset['G'].replace({1:2})
-    # op_pres_1 = st.radio('Is the pressure less than 60 bar and between 10 and 60?', ('Yes','No'), index=0)
-    # if op_pres_1=='Yes':
-    #     op_pres = 'Less than 10 Bar'
-    # else:
-    #     op_pres_2 = st.radio('Is the pressure less than 60 bar?', ('Yes','No'), index=0)
-    #     if op_pres_2 == 'Yes':
-    #         op_pres = 'Less than 10 Bar'
-    #     else:
-    #         st.warning('''
-    #             The product selector is only for low pressure boilers less than 60 bars.
-    #             ''')
+
+    # Water quality
     fw = st.selectbox('Feed Water Quality', ('All (Raw/RO/Demineralized)', 'Raw, RO Only'), index=0)
     if fw=='Raw, RO Only':
         dset['H'] = dset['H'].replace({1:2})
-        # fw='All (Raw, RO, Demin)'
-    # check1 = st.checkbox('Raw')
-    # check2 = st.checkbox('RO')
-    # check3 = st.checkbox('Demin')
 
+    # FDA
     fda = st.radio('Is an FDA approved product for direct food application required? ',('Yes','No'))
     if fda == 'No':
         dset['I'] = dset['I'].replace({0:1})
         fda = 'Yes'
+
+    # Dairy
     dairy = st.radio('Is it for Dairy application ?', ('Yes','No'), index=0)
     if dairy == 'No':
         dset['J'] = dset['J'].replace({0:1})
-        dairy = 'Yes'
+        dairy = 'both'
+
+    # Function type
     func_type = st.selectbox('Type of function required',(
         '---------',
         'Multi Functional (Internal + Amine + O2)',
@@ -85,13 +114,17 @@ def product_selector():
         'Single Functional Products'
     ),index=0)
 
+    # -------------------------------------------------
+    # Multi Functional (Internal + Amine + O2)
+    # -------------------------------------------------
+
     if func_type=='Multi Functional (Internal + Amine + O2)':
         sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0)
         
         defoamer = 'No'
-        internal,po4 = internal_function()
-        n_amine, yellow, dr = amine_function()
-        ox_scav, passivation, contains_cat = ox_scav_function()
+        internal,po4 = internal_function(func_type='Multi Functional (Internal + Amine + O2)')
+        n_amine, yellow, dr = amine_function(func_type='Multi Functional (Internal + Amine + O2)')
+        ox_scav, passivation, contains_cat = ox_scav_function(func_type='Multi Functional (Internal + Amine + O2)',solid_req=sl)
         opco_val = opco_dict[opco]
         valv = list()
         valv = valv + opco_val
@@ -116,6 +149,10 @@ def product_selector():
             ]
         )
         submit_button = st.button(label='Submit')
+
+    # -------------------------------------------------
+    # Multi Functional (Amine + O2)
+    # -------------------------------------------------
 
     if func_type=='Multi Functional (Amine + O2)':
         sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0)
@@ -123,8 +160,8 @@ def product_selector():
         internal = 'No'
         po4 = 'No'
         defoamer = 'No'
-        n_amine, yellow, dr = amine_function()
-        ox_scav, passivation, contains_cat = ox_scav_function()
+        n_amine, yellow, dr = amine_function(func_type = 'Multi Functional (Amine + O2)')
+        ox_scav, passivation, contains_cat = ox_scav_function(func_type = 'Multi Functional (Amine + O2)',solid_req=sl)
         opco_val = opco_dict[opco]
         valv = list()
         valv = valv + opco_val
@@ -150,18 +187,20 @@ def product_selector():
         )
         submit_button = st.button(label='Submit')
 
+    # -------------------------------------------------
+    # Multi Functional (Internal + Defoamer)
+    # -------------------------------------------------
             
     if func_type=='Multi Functional (Internal + Defoamer)':
-        sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=1)
-
+        sl = st.radio('Is a Solid/Liquid product required?', ['Liquid'])
         n_amine = 'No'
         yellow = "No"
         dr = "Not Applicable"
         ox_scav = 'No'
         passivation = 'No'
         contains_cat = 'No'
-        internal,po4 = internal_function()
-        defoamer = defoamer_function()
+        internal,po4 = internal_function(func_type='Multi Functional (Internal + Defoamer)')
+        defoamer = defoamer_function(func_type='Multi Functional (Internal + Defoamer)')
         opco_val = opco_dict[opco]
         valv = list()
         valv = valv + opco_val
@@ -192,13 +231,24 @@ def product_selector():
             'valv3':None,
             'valv4':None
         }
-        # Internal
+
+        # ---------------------------------------------
+        # Internal for single function
+        # ---------------------------------------------
+
         st.markdown("## Internal Treatment")
         internal = st.radio('Is Internal treatment required?', ('Yes','No'), index=1)
-        # po4 = 'No'
         if internal == 'Yes':
             sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='1')
-            po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ('Yes','No'), index=0)
+            if sl == 'Solid':
+                if dairy == 'Yes':
+                    po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ['Yes'])
+                else:
+                    po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ['Yes','No'])
+            else:
+                po4 = st.radio('Is Phosphate (PO4) allowed in the product ?', ('Yes','No'), index=0)
+
+
             opco_val = opco_dict[opco]
             valv1 = list()
             valv1 = valv1 + opco_val
@@ -222,18 +272,25 @@ def product_selector():
                 ]
             )
             master_list['valv1'] = valv1
-        # st.write(master_list)
-        # amine
+
+        # ---------------------------------------------
+        # amine for single function
+        # ---------------------------------------------
+
         st.markdown("## Neutralizing amine")
+
         n_amine = st.radio('Is Neutralizing Amine treatment required for steam and condensate treatment?', ('Yes','No'), index=1)
-        # yellow='No'
-        # dr = 'Not Applicable'
         if n_amine == 'Yes':
+            if dairy == 'Yes':
+                st.warning("💡: Neutralizing Amine products can not be used for dairy applications. Please recheck the question 'Is it for Dairy application ?' ")
             sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0, key='2')
             yellow = st.radio('Is there Yellow metal in the system?', ['Yes', 'No'], index=0)
             if yellow == 'No':
                 dset['Q']=dset['Q'].replace({1:0})
-            dr = st.selectbox('Distribution ratio', ['< 2.4', '> 2.4','Not Applicable'], index=0)
+            if sl =='Solid':
+                dr = st.selectbox('Distribution ratio', ['< 2.4'])
+            else:
+                dr = st.selectbox('Distribution ratio', ['> 2.4'])
             opco_val = opco_dict[opco]
             valv2 = list()
             valv2 = valv2 + opco_val
@@ -257,13 +314,18 @@ def product_selector():
                 ]
             )
             master_list['valv2'] = valv2
-        # st.write(master_list)
-        # Defoamer
+
+        # ---------------------------------------------
+        # Defoamer for single function
+        # ---------------------------------------------
+
         st.markdown("## Defoamer")
         defoamer = st.radio('Is a Defoamer required ?', ('Yes','No'), index=1)
         if defoamer == 'Yes':
-            # sl = st.radio('Is a Solid/Liquid product required?', ['Liquid'], key='3')
-            sl = 'Liquid'
+            sl = st.radio('Is a Solid/Liquid product required?', ['Liquid'])
+            # sl = 'Liquid'
+            if opco not in ['USA','Canada','LATAM']:
+                st.warning('There is no single functional defoamer available for your OPCO. Please re-check your input conditions or select a Multifunctional (Internal + Defoamer) Product.')
             opco_val = opco_dict[opco]
             valv3 = list()
             valv3 = valv3 + opco_val
@@ -287,16 +349,26 @@ def product_selector():
                 ]
             )
             master_list['valv3'] = valv3
-        # st.write(master_list)
-        # OX scav 
+
+        # ---------------------------------------------
+        # Oxygen scavenger for single function
+        # ---------------------------------------------
+
         st.markdown("## Oxygen Scavengers")
         ox_scav = st.radio('Is Oxygen Scavenger required ?', ('Yes','No'), index=1)
         passivation='No'
         contains_cat = 'No'
         if ox_scav=='Yes':
             sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0,key='4')
-            passivation = st.radio('Is Passivation Required?', ('Yes','No'), index=1)
-            contains_cat = st.radio('Is a product that contains catalyst required?', ('Yes','No'), index=1)
+            # passivation = st.radio('Is Passivation Required?', ('Yes','No'), index=1)
+            if sl == 'Solid':
+                contains_cat =  st.radio('Is a product that contains catalyst required?', ['No'])
+                passivation = st.radio('Is Passivation Required?', ['Yes'])
+
+            else:
+                contains_cat =  st.radio('Is a product that contains catalyst required?', ['Yes'])
+                passivation = st.radio('Is Passivation Required?', ['No'])
+                # contains_cat = st.radio('Is a product that contains catalyst required?', ('Yes','No'), index=1)
             opco_val = opco_dict[opco]
             valv4 = list()
             valv4 = valv4 + opco_val
@@ -320,7 +392,6 @@ def product_selector():
                 ]
             )
             master_list['valv4'] = valv4
-        # st.write(master_list)
         submit_button = st.button(label='Submit')
 
     if submit_button:
@@ -330,23 +401,52 @@ def product_selector():
         y_train = y
         clf = tree.DecisionTreeClassifier(max_depth=100)
         clf.fit(X_train,y_train)
+
+        # -----------------------------------------------------------------------------
+        # Dealing with Xtrain Ytrain separately with respect to each function type
+        # Multifunctional : Only one product predictions
+        # Single function: Multiple product predictions (max 4 types)
+        # -----------------------------------------------------------------------------
+
+
         if func_type !='Single Functional Products':
-            m = [valv==i for i in X.values.tolist()]
-            print(m)
-            # st.write(valv)
-            if any(m):
-                valv_df = pd.DataFrame(valv).transpose()
-                valv_df.columns = X.columns
-                pred_ui = clf.predict(valv_df)
-                print(pred_ui)
-                st.success(f'The product for the following configuration is {pred_ui}')
+            # -----------------------------------------------------------------------------
+            # Everything but single functional product will come here
+            # -----------------------------------------------------------------------------
+            print('Len of val is', len(valv))
+            X_list = X.values.tolist()
+            msg = None
+            prod = None
+            err = None
+            change_params = []
+            print('*************************')
+            for item in X_list:
+                if all(compareList(item,valv)):
+                    valv_df = pd.DataFrame(valv).transpose()
+                    valv_df.columns = X.columns
+                    pred_ui = clf.predict(valv_df)
+                    print(pred_ui)
+                    prod = pred_ui
+                elif sum(compareList(item,valv))>18:
+                    print(sum(compareList(item,valv)))
+                    cmp_list = compareList(item,valv)
+                    change_index = [i for i, x in enumerate(cmp_list) if not x]
+                    # and (i in range(0,10))
+                    change_params = change_params + [change_dict[i] for i in change_index if (change_dict[i] not in change_params)]
+                    # st.write(change_index)
+                    # change_params = change_params + [change_dict.get(i) for i in change_index if i not in change_params]
+                    msg = f'We do not have a product for the given combination. But, changes in the following questions can lead to a product'
+                else:
+                    err = 'No products found'
+            if prod :
+                st.success(f'The product for the above configuration is/are {prod}')
+            elif msg:
+                st.warning(msg)
+                st.write(pd.DataFrame({
+                    'Questions':list(set(change_params))
+                }, index=None))
             else:
-                print('Not here')
-                st.error('''
-                We could not find a product for such an input combination :( 
-                Please re-check the input condition or parameters!
-                ''')
-            # st.write(valv)
+                st.error(err)
         else:
             # st.write(master_list)
             final_prods = list()
@@ -355,7 +455,6 @@ def product_selector():
                 'Neutralizing amine',
                 'Defoamer',
                 'Oxygen Scavengers'
-
             ]
             for key,val in master_list.items():
                 valv = master_list[key]
@@ -368,10 +467,10 @@ def product_selector():
                         pred_ui = clf.predict(valv_df)
                         final_prods.extend(pred_ui)
                     else:
-                        final_prods.extend(['No product found'])
+                        final_prods.extend(['No product found or the treatment was not selected'])
                         # st.write(f'found {key}')
                 else:
-                    final_prods.extend(['No product found'])
+                    final_prods.extend(['No product found or the treatment was not selected'])
 
             final_zip = list(zip(final_prods,final_prods_keys))
             final_dict = {}
@@ -410,3 +509,8 @@ if auth_sbmt:
         st.sidebar.error('User does not exist! Please contact the admin to add you as a user')
 else :
     st.info('Please login to continue')
+
+
+
+
+ 
