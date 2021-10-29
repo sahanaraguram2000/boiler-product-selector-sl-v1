@@ -4,6 +4,31 @@ users = {
     'Firestorm':'Buckman123'
 }
 
+# Change request 
+change_dict = {
+    0:'OPCO',
+    1:'OPCO',
+    2:'OPCO',
+    3:'OPCO',
+    4:'OPCO',
+    5:'OPCO',
+    6:'Operating Pressure (bar)',
+    7:'Feed water quality',
+    8:'Is an FDA approved product for direct food application required?',
+    9:'Is it for Dairy application ?',
+    10:'Type of function required',
+    11:'Is a Solid/Liquid product required?',
+    12:'Is Internal treatment required?',
+    13:'Is Phosphate (PO4) allowed in the product ?',
+    14:'Is a Defoamer required ?',
+    15:'Is Neutralizing Amine treatment required for steam and condensate treatment?',
+    16:'Is there Yellow metal in the system?',
+    17:'Distribution ratio',
+    18:'Is Oxygen Scavenger required ?',
+    19:'Is Passivation Required?',
+    20:'Is a product that contains catalyst required?',
+}
+
 
 
 
@@ -33,7 +58,8 @@ fda_dict ={
 }
 dairy_dict = {
     'Yes':1,
-    'No':0
+    'No':0,
+    'both':1
 }
 
 func_type_dict = {
