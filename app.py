@@ -7,7 +7,7 @@ from sklearn import tree
 from sklearn import metrics
 
 
-dset = pd.read_csv('Test_v4refine.csv')
+dset = pd.read_csv('decision_tree_v2.csv')
 
 def compareList(l1, l2):
     return [i==j for i, j in zip(l1, l2)]
@@ -81,16 +81,19 @@ def product_selector():
     submit_button=None
     #OPCO
     opco = st.selectbox('Operating Country (OPCO)', ['USA','China','RSA','LATAM','Canada','EMEA'], index=0)
-    opco_pres_1 = st.slider('Operating Pressure (bar)',min_value=0, max_value=60)
+    col1, col2 = st.columns(2)
+    opco_pres_1 = col1.slider('Operating Pressure (bar)',min_value=0, max_value=60)
     if opco_pres_1 < 10:
         op_pres = 'Less than 60 Bar'
     else:
         op_pres = 'Between 10 to 60 Bar'
         dset['G'] = dset['G'].replace({1:2})
+    opco_pres_2 = opco_pres_1*14.5
+    col2.metric(label="Operating pressue (psig)", value=str(opco_pres_2)+ " psig", delta_color="off")
 
     # Water quality
-    fw = st.selectbox('Feed Water Quality', ('All (Raw/RO/Demineralized)', 'Raw, RO Only'), index=0)
-    if fw=='Raw, RO Only':
+    fw = st.selectbox('Feed Water Quality', ('All (Raw/RO/Softened/Demin)', 'Raw/RO/Softened'), index=0)
+    if fw=='Raw/RO/Softened':
         dset['H'] = dset['H'].replace({1:2})
 
     # FDA
@@ -392,7 +395,32 @@ def product_selector():
                 ]
             )
             master_list['valv4'] = valv4
+        
+        
+        # Adding Alkalinity Booster 
+
+        st.markdown("## Alkalinity Booster")
+        alk_dict={
+            'selected':'No',
+            'product':["No product found or the treatment was not selected"]
+        }
+        alk_booster = st.radio('Is Alkalinity Booster required ?', ('Yes','No'), index=1)
+        if alk_booster == 'Yes':
+            sl = st.radio('Is a Solid/Liquid product required?', ('Solid','Liquid'), index=0,key='5')
+            if (sl == 'Solid') and (opco in ['USA','Canada', 'LATAM', 'RSA']) and (op_pres=='Between 10 to 60 Bar') and (fw == 'All (Raw/RO/Softened/Demin)') and (fda == 'Yes') and (dairy == 'both'):
+                alk_dict['selected'] = 'Yes'
+                alk_dict['product'] = ['Impackt BW ALK']
+            elif (sl == 'Liquid')  and (opco in ['Canada']) and (op_pres=='Between 10 to 60 Bar') and (fw == 'All (Raw/RO/Softened/Demin)') and (fda == 'Yes') and (dairy == 'both'):
+                alk_dict['selected'] = 'Yes'
+                alk_dict['product'] = ['BLB9593']
+            else:
+                pass
         submit_button = st.button(label='Submit')
+
+        
+
+
+
 
     if submit_button:
         X = dset.drop(columns=['V'])
@@ -439,7 +467,8 @@ def product_selector():
                 else:
                     err = 'No products found'
             if prod :
-                st.success(f'The product for the above configuration is/are {prod}')
+                st.success(f'The product for the above configuration is/are {prod[0]}')
+                st.info(f'{desc_dict[prod[0]]}')
             elif msg:
                 st.warning(msg)
                 st.write(pd.DataFrame({
@@ -454,7 +483,8 @@ def product_selector():
                 'Internal treatment',
                 'Neutralizing amine',
                 'Defoamer',
-                'Oxygen Scavengers'
+                'Oxygen Scavengers',
+                'Alkalinity Booster'
             ]
             for key,val in master_list.items():
                 valv = master_list[key]
@@ -471,7 +501,7 @@ def product_selector():
                         # st.write(f'found {key}')
                 else:
                     final_prods.extend(['No product found or the treatment was not selected'])
-
+            final_prods.extend(alk_dict['product'])
             final_zip = list(zip(final_prods,final_prods_keys))
             final_dict = {}
             for val,key in final_zip:
@@ -490,6 +520,9 @@ def product_selector():
                 st.success(f'''The product(s) for the above configuration is/are ''')
                 # st.write(pd.DataFrame(final_dict).T)
                 st.write(final_df)
+                for prod in final_prods:
+                    if prod != 'No product found or the treatment was not selected':
+                        st.info(f"{prod} : {desc_dict.get(prod)}")
 
 st.title('Boiler Product Selector')
 st.sidebar.title('Authentication')
@@ -513,4 +546,6 @@ else :
 
 
 
- 
+    
+
+   
