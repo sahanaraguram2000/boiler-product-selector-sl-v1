@@ -1,4 +1,7 @@
+import pandas as pd
 
+desc = pd.read_csv('description_2.csv')
+desc_dict = desc.set_index('Product')['Description'].to_dict()
 # Users are put here in the format of 'username':'password'
 users = {
     'Firestorm':'Buckman123'
@@ -48,8 +51,8 @@ op_pres_dict={
 
 
 fw_dict = {
-    'All (Raw/RO/Demineralized)':1, # 1 -> All(Raw/Ro/Demin)
-    'Raw, RO Only':2 #2 -> Raw and RO only
+    'All (Raw/RO/Softened/Demin)':1, # 1 -> All(Raw/Ro/Demin)
+    'Raw/RO/Softened':2 #2 -> Raw and RO only
 }
 
 fda_dict ={
